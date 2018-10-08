@@ -1,4 +1,4 @@
-class UserSocket {
+class Player {
     constructor(url) {
         // 建立websocket连接
         this.ws = new WebSocket(url);
@@ -11,4 +11,5 @@ class UserSocket {
     send(msg) {
         this.ws.send(JSON.stringify(msg));
     }
+    
 }
