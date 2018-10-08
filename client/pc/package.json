@@ -1,0 +1,61 @@
+{
+  "name": "webvr-chatroom",
+  "version": "3.3.0",
+  "description": "A webvr chatroom project for three.js",
+  "scripts": {
+    "start": "npm run client & npm run server",
+    "client": "NODE_ENV=development webpack-dev-server --mode development --config ./client/webpack.config.js",
+    "server": "nodemon server/app.js --watch server",
+    "build": "NODE_ENV=production webpack --mode production --config ./client/webpack.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YorkChan94/webvr-chatroom.git"
+  },
+  "keywords": [
+    "webvr",
+    "three",
+    "webpack",
+    "chatroom",
+    "webrtc",
+    "websocket"
+  ],
+  "author": "Yone Chen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/YoneChen/webvr-chatroom/issues"
+  },
+  "homepage": "https://github.com/YoneChen/webvr-chatroom#readme",
+  "dependencies": {
+    "@tweenjs/tween.js": "^17.2.0",
+    "cannon": "^0.6.2",
+    "three": "^0.86.0",
+    "webrtc-adapter": "^6.1.5",
+    "webvr-polyfill": "^0.10.6",
+    "ws": "^5.1.1"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.4",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "clean-webpack-plugin": "^0.1.19",
+    "copy-webpack-plugin": "^4.5.1",
+    "css-loader": "^0.26.2",
+    "cssnano": "^3.10.0",
+    "extract-text-webpack-plugin": "^4.0.0-beta.0",
+    "file-loader": "^1.1.6",
+    "html-loader": "^0.5.5",
+    "html-webpack-plugin": "^3.2.0",
+    "nodemon": "^1.17.3",
+    "postcss-cssnext": "^3.1.0",
+    "postcss-loader": "^2.1.4",
+    "shader-loader": "^1.3.0",
+    "style-loader": "^0.13.2",
+    "url-loader": "^0.5.8",
+    "webpack": "^4.5.0",
+    "webpack-cli": "^2.0.14",
+    "webpack-dev-server": "^3.1.3"
+  }
+}
