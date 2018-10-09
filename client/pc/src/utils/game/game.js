@@ -5,9 +5,9 @@ export function showQRCode() {
 }
 const MSG_LIST = { CREATE_GAME: 'CREATE_GAME' };
 class GameManager {
-    constructor(url) {
+    constructor(socketUrl,mobileUrl) {
         // 建立websocket连接
-        this.ws = new WebSocket(url);
+        this.ws = new WebSocket(socketUrl);
         this.ws.addEventListener('message',({data}) => {
             const msg = JSON.parse(data);
             this.onData(res);
@@ -18,10 +18,13 @@ class GameManager {
         this.send(msg);
     }
 
-    createPlayer(options) {
+    addPlayer(options) {
         let player = new Player(options);
-        showQRCode();
-        this._playerList.push()
+        this._playerList.push(player);
+        return player;
+    }
+    showEntryCode(player) {
+
     }
     onData(msg) {
         
@@ -30,3 +33,4 @@ class GameManager {
         this.ws.send(JSON.stringify(msg));
     }
 }
+export default GameManager

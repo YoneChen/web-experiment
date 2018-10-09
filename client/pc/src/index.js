@@ -1,9 +1,9 @@
-import WebVRApp from '@/core'
+import Game from '@/core'
 // create routers map 
-WebVRApp.create([
+Game.create([
     {
         path: '/singlePlayer', // e.g http://127.0.1:9000/
         component: () => import('@/views/singlePlayer.js')
     }
-],document.querySelector('.webvr-container')
+],document.querySelector('.wrap')
 );

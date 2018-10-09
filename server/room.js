@@ -2,18 +2,16 @@ class Room {
     constructor(name) {
         this.id = Date.now();
         this.name = name;
-        this._playerSet = {};
+        this.playerList = [];
     }
-    getPlayer(playerId) {
-        return this._playerSet[playerId];
+    addPlayer(player) {
+        this.playerList.push(player);
     }
-    addPlayer(playerId,player) {
-        this._playerSet[playerId] = player;
-    }
-    removePlayer(playerId) {
-        delete this._playerSet[playerId];
+    removePlayer(player) {
+        this.playerList.splice(this.playerList.indexOf(player),1);
     }
     removeAllPlayers() {
-        this._playerSet = {};
+        this.playerList = [];
     }
 }
+export default Room;

@@ -1,66 +1,53 @@
 
 const WebSocket = require('ws');
 const port = 8086;
-const Room = require('./room.js');
-
+const Game = require('./room');
+const Player = require('./player')
 const MSG_TYPES = {
-    SELF_CONNECTED: 'SELF_CONNECTED',
-    OTHER_CONNECTED: 'OTHER_CONNECTED'
+    playerDataSend: 'PLAYER_DATA_SEND',
+    hostJoin: 'HOST_JOIN',
+    hostLeave: 'HOST_LEAVE',
+    mobileJoin: 'MOBILE_JOIN',
+    mobileLeave: 'MOBILE_LEAVE'
 }
-
-const wss = new WebSocket.Server({ port });
-let room = new Room();
-wss.on('connection', function connection(ws) {
-    connectionFeedback(wss,ws); // 新用户连接，通知该用户其他用户的userId，通知其他用户该用户的userId
-    ws.on('message', function incoming(data) {
-        const msg = JSON.parse(data);
-        sendMsg(wss,ws,msg);
-    });
-});
-function connectionFeedback(wss,ws) {
-     // 用户连接，发送给该用户其他上线用户userId和roleData列表，并生成该用户userId，再将userId广播给其他用户
-    const useridlist = Array.from(wss.clients).filter(client => client.userId).map(client => client.userId);
-    room.check(useridlist);
-    const userId = Date.now() + '';
-    console.log(userId,'connect success');
-    console.log('the room has',room.userNumber,'people')
-    const otherDataList = room.getUserDataList();
-    const roleData = room.addUser(userId);
-    // 连接成功，通知该用户，其他客户端信息
-    let msg = {
-        msg_type: MSG_TYPES.SELF_CONNECTED,
-        userId,
-        content: {
-            roleData, // 给用户分配位置
-            userDataList: otherDataList
-        }
-    };
-    ws.send(JSON.stringify(msg));
-    Object.defineProperty(ws,'userId',{
-        configurable: false,
-        writable: false,
-        value: userId
-    });
-    // 通知其他客户端，该用户已上线
-    msg = {
-        msg_type: MSG_TYPES.OTHER_CONNECTED,
-        userId,
-        content: {
-            roleData
-        }
-    };
-    broadcast(wss,ws,msg);
-}
-function sendMsg(wss,ws,msg) { // 转发数据，将数据转发给对应userId接收方，并将发送方userId传给接收方
-    if (msg.userId) {
-        const client = Array.from(wss.clients).find(client => client.userId === msg.userId);
-        msg.userId = ws.userId;
-        if(client) client.send(JSON.stringify(msg));
-    } else {
-        msg.userId = ws.userId;
-        broadcast(wss,ws,msg);
+class GameServer {
+    constructor(port) {
+        let wss = new WebSocket.Server({ port });
+        wss.on('connection', function connection(ws) {
+            // connectionFeedback(wss,ws); // 新用户连接，通知该用户其他用户的userId，通知其他用户该用户的userId
+            ws.on('message', function incoming(data) {
+                const msg = JSON.parse(data);
+                switch(msg.name) {
+                    case MSG_TYPES.hostJoin: this.hostJoin(ws); break;
+                    case MSG_TYPES.mobileJoin: this.mobileJoin(ws); break;
+                    case MSG_TYPES.playerDataSend: this.playerDataSend(ws,msg); break; // 手机控制器数据发送给主机
+                }
+                sendMsg(wss,ws,msg);
+            });
+        });
     }
-}
+    hostJoin(ws) {
+        this.game = new Game();
+        this.game.ws = ws;
+    }
+    mobileJoin(ws) {
+        let player = new Player();
+        player.ws = ws;
+        this.game.addPlayer(player);
+        // ws.send()
+    }
+    getPlayerByWS(ws) {
+        return this.game.playerList.find(player => player.ws === ws);
+    }
+    // 手机控制器数据发送给主机
+    playerDataSend(ws,msg) {
+        let player = getPlayerByWS(ws);
+        if(!player) return;
+        Object.assign(player,msg.body);
+        this.game.ws.send(JSON.stringify(msg));
+    }
+} 
+new GameServer(port);
 function broadcast(wss,ws,data) {
     // Broadcast to everyone else.
     wss.clients.forEach(function each(client) {

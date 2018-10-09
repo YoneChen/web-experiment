@@ -5,17 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>PC</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        html,body {
+            height: 100%;
+        }
+        body {
+            font-size: 14px;
+            font-family: "Arial","Microsoft YaHei","黑体",sans-serif;
+            overflow: hidden;
+        }
+        .wrap {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            cursor: -webkit-grab;
+        }
+    </style>
 </head>
 <body>
+    <div class="wrap"></div>
     <script src=""></script>
     <script>
-        class Game extends Base {
-            start() {
+        class Game extends {
 
-            }
-            update() {
-
-            }
         }
     </script>
 </body>
