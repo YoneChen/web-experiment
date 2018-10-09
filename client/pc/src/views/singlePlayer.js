@@ -1,23 +1,15 @@
 /*global THREE:true*/
-import {VRScene} from '@/core';
+import {Scene} from '@/core';
 import UserPeer from '@/utils/userPeer';
-import {SelfRole,OtherRole,Space,Button} from '@/components';
+import {SpaceShip,City,Button} from '@/components';
 import CONFIG from '../../config'
 import '@/lib/GLTFLoader';
-class Chatroom extends VRScene {
+class App extends Scene {
     start() {
         this.roleSet = {};
         this.otherDataList = [];
-        this.addSpace();
+        this.addCity();
         this.addDirectLight();
-        this.userPeer = new UserPeer({
-            url: CONFIG.socketUrl,
-            iceServers: CONFIG.iceServers
-        });
-        this.userPeer.onSocketConnected = ::this.addSelfRole;
-        this.userPeer.onPeerConnected = ::this.addOtherRole;
-        this.userPeer.onDataReceived = ::this.receiveRoleData;
-        this.userPeer.onPeerDisconnected = ::this.removeOtherRole;
         
     }
     loaded() {
@@ -30,8 +22,8 @@ class Chatroom extends VRScene {
         this.selfRole.audioListener = this.root.audioListener;
         this.initRole(this.selfRole,roleData.role_transform);
     }
-    addOtherRole({ userId, roleData,stream }) {
-        const role = new OtherRole(this.root);
+    addAircraft() {
+        const aircraft = new Aircraft();
         role.name = userId;
         this.initRole(role,roleData.role_transform);
         role.audioStream = stream;
@@ -86,7 +78,7 @@ class Chatroom extends VRScene {
         model.roleInfo = roleData.camera_transform;
         // if(speaker) speaker.update(roleData.position);
     }
-    removeOtherRole({userId}) {
+    removeRole({userId}) {
         const {model} = this.roleSet[userId];
         if (!model) return;
         this.remove(model);
@@ -104,12 +96,8 @@ class Chatroom extends VRScene {
         light.shadow.camera.far = 500;
         this.add(light);
     }
-    audioLoaded({userId,stream}) {
-        const {model} = this.roleSet[userId];
-        model.audioStream = stream;
-    }
     update() {
         this.updateAllRoles();
     }
 }
-export default Chatroom;
+export default App;
