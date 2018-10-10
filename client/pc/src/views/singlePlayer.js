@@ -16,7 +16,6 @@ class App extends Scene {
     }
     loaded() {
         this.root.game.showEntryCode();
-        this.root.game.showEntryCode();
         // play the sound
         //  this.envSound.play();
     }
