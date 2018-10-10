@@ -1,7 +1,7 @@
 /*global THREE:true*/
 /*global TWEEN:true*/
-import './css/main.css';
-import VRButton from './button';
+// import './css/main.css';
+// import VRButton from './button';
 import Router from './router';
 const $scope = {};
 function create(routers, container, fov, far) {
@@ -11,7 +11,7 @@ function create(routers, container, fov, far) {
 	Router.onload = addScene;
 	$scope.router = Router;
 }
-function _createRootScene(container = document.body, fov = 70, far = 5000) {
+function _createRootScene(container = document.body, fov = 70, far = 10000) {
 	if (!(container instanceof HTMLElement)) {
 		throw new Error('container is not a HTMLElement!');
 	}
@@ -26,6 +26,7 @@ function _createRootScene(container = document.body, fov = 70, far = 5000) {
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	renderer.shadowMap.enabled = true;
 	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setClearColor(0xffffff);
 	container.appendChild(renderer.domElement);
 	$scope.scene = scene;
 	$scope.camera = camera;
@@ -52,14 +53,14 @@ function _initAudio() {
 	$scope.audioListener = audioListener;
 }
 function renderStop() {
-	$scope.gazer.removeAll();
+	// $scope.gazer.removeAll();
 	$scope.renderer.dispose();
 	TWEEN.removeAll();
 }
 function renderStart(callback) {
 	$scope.renderer.animate(function () {
 		callback();
-		$scope.gazer.update($scope.camera);
+		// $scope.gazer.update($scope.camera);
 		TWEEN.update();
 		$scope.renderer.render($scope.scene, $scope.camera);
 	});
@@ -77,7 +78,7 @@ function addScene(scene) {
 }
 function removeScene() {
 	renderStop();
-	$scope.display.resetPose();
+	// $scope.display.resetPose();
 	clearScene();
 }
 

@@ -4,7 +4,7 @@ const MODEL_CITY_PATH = 'model/city/model.gltf';
 class City extends Object3D {
     constructor(root) {
         super();
-        this.audioListener = root.audioListener;
+        // this.audioListener = root.audioListener;
         this.name = 'city';
         this._isLoaded = false;
         this._init();
@@ -12,7 +12,7 @@ class City extends Object3D {
     async _init() {
         const {scene: model} = await getGLTFModel(MODEL_CITY_PATH);
         this._isLoaded = true;
-        // model.scale.set(0.01,0.01,0.01);
+        model.scale.set(100,100,100);
         // model.position.set(0,-17,3);
         this.add(model);
     }

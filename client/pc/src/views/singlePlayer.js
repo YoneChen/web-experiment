@@ -2,20 +2,21 @@
 import {Scene} from '@/core';
 import GameManager from '@/utils/game/game';
 import {Aircraft,City,Button} from '@/components';
-import CONFIG from '../../config'
 import '@/lib/GLTFLoader';
-const url = '';
+const socketUrl = '',
+mobileUrl = ''
 class App extends Scene {
     start() {
-        this.root.game = new GameManager(socketUrl,mobileUrl);
-        this.root.game.createGame();
-        this.root.game.onPlayerConnected = this.onPlayerConnected.bind(this);
+        // this.root.game = new GameManager(socketUrl,mobileUrl);
+        // this.root.game.createGame();
+        // this.root.game.onPlayerConnected = this.onPlayerConnected.bind(this);
         this.addCity();
+        this.addAircraft();
         this.addDirectLight();
         
     }
     loaded() {
-        this.root.game.showEntryCode();
+        // this.root.game.showEntryCode();
         // play the sound
         //  this.envSound.play();
     }
@@ -29,12 +30,20 @@ class App extends Scene {
 
     }
     addCity() {
-        const aircraft = new Aircraft();
-        this.add(aircraft);
+        const city = new City();
+        this.add(city);
+        // let mesh = new THREE.Mesh(new THREE.CubeGeometry(10,10,10), new THREE.MeshLambertMaterial({
+        //     color: 0xffffff
+        // }))
+        // mesh.position.set(0,0,-3);
+        // this.add(mesh)
     }
     addAircraft() {
-        const aircraft = new Aircraft();
+        const aircraft = new Aircraft(this.root.camera);
+        // aircraft.position.set(0,50,4);
+        window.aircraft = aircraft;
         this.add(aircraft);
+        this.aircraft = aircraft;
     }
     initRole(role,{position,rotation}) {
         role.position.set(position.x,position.y,position.z);
@@ -104,7 +113,7 @@ class App extends Scene {
         this.add(light);
     }
     update() {
-        this.updateAllRoles();
+        // this.aircraft.position.y -= 0.1;
     }
 }
 export default App;

@@ -1,5 +1,6 @@
 import Player from './player'
 import Msg from './message'
+import QRCode from 'qrcode'
 export function showQRCode() {
     
 }

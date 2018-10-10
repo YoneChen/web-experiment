@@ -1,25 +1,25 @@
-class GamePad {
-    constructor() {
-        this.orientation = {};
-        this._init();
-        this._bindEvent();
-    }
-    _init() {
-        if (!/Android|iPhone|iPad/i.test(navigator.userAgent) || !window.DeviceOrientationEvent) {
-            alert('该设备不支持陀螺仪');
-            return;
-        }
-        this.buttonA = new GamePadButton()
-    }
-    _bindEvent() {
-        let handleOrientation = event => {
-            this.orientation.x = event.beta;
-            this.orientation.x = event.beta;
-            this.orientation.z = event.alpha;
-        }
-        window.addEventListener('deviceorientation',handleOrientation.bind(this));
-    }
-}
+// class GamePad {
+//     constructor() {
+//         this.orientation = {};
+//         this._init();
+//         this._bindEvent();
+//     }
+//     _init() {
+//         if (!/Android|iPhone|iPad/i.test(navigator.userAgent) || !window.DeviceOrientationEvent) {
+//             alert('该设备不支持陀螺仪');
+//             return;
+//         }
+//         this.buttonA = new GamePadButton()
+//     }
+//     _bindEvent() {
+//         let handleOrientation = event => {
+//             this.orientation.x = event.beta;
+//             this.orientation.x = event.beta;
+//             this.orientation.z = event.alpha;
+//         }
+//         window.addEventListener('deviceorientation',handleOrientation.bind(this));
+//     }
+// }
 class Base {
     constructor(el) {
         this.el = el;
@@ -54,12 +54,21 @@ class Base {
     start() {}
     update() {}
 }
-class UIGamePad extends Base {
+class GamePad extends Base {
     constructor(el) {
         super(el);
+        this.orientation = {};
     }
     _bindEvent() {
         const {canvas} = this;
+        // 陀螺仪数据
+        let handleOrientation = event => {
+            this.orientation.x = event.beta;
+            this.orientation.x = event.beta;
+            this.orientation.z = event.alpha;
+        }
+        window.addEventListener('deviceorientation',handleOrientation.bind(this));
+        // 按钮控件
         let isTrigger = (touch,control) => {
             touch.pageX > control.left && touch.pageY > control.top && touch.pageX < control.right && control.pageY < control.bottom;
         }
@@ -80,10 +89,11 @@ class UIGamePad extends Base {
     }
     start() {
         this._bindEvent();
-        this.buttonA = new UIGamepadButton();
+        this.buttonA = new GamepadButton();
         this.addControl(this.buttonA);
     }
     update() {
+        sendMsg();
     }
 }
 // 手柄元组件
