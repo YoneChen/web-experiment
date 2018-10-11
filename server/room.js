@@ -14,4 +14,4 @@ class Room {
         this.playerList = [];
     }
 }
-export default Room;
+module.exports = Room;

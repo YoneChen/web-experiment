@@ -8,12 +8,16 @@ const MSG_TYPES = {
     hostJoin: 'HOST_JOIN',
     hostLeave: 'HOST_LEAVE',
     mobileJoin: 'MOBILE_JOIN',
-    mobileLeave: 'MOBILE_LEAVE'
+    mobileLeave: 'MOBILE_LEAVE',
+    connected: 'CONNECTED'
 }
 class GameServer {
     constructor(port) {
         let wss = new WebSocket.Server({ port });
         wss.on('connection', function connection(ws) {
+            ws.send(JSON.stringify({
+                name: MSG_TYPES.connected
+            }));
             // connectionFeedback(wss,ws); // 新用户连接，通知该用户其他用户的userId，通知其他用户该用户的userId
             ws.on('message', function incoming(data) {
                 const msg = JSON.parse(data);
@@ -22,7 +26,6 @@ class GameServer {
                     case MSG_TYPES.mobileJoin: this.mobileJoin(ws); break;
                     case MSG_TYPES.playerDataSend: this.playerDataSend(ws,msg); break; // 手机控制器数据发送给主机
                 }
-                sendMsg(wss,ws,msg);
             });
         });
     }

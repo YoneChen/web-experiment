@@ -12,18 +12,41 @@
 
     </section>
     <section class="gamepad">
-        <canvas></canvas>
     </section>
     <script src="../js/gamepad.js"></script>
     <script>
+        const MSG_TYPES = {
+            playerDataSend: 'PLAYER_DATA_SEND',
+            hostJoin: 'HOST_JOIN',
+            hostLeave: 'HOST_LEAVE',
+            mobileJoin: 'MOBILE_JOIN',
+            mobileLeave: 'MOBILE_LEAVE',
+            connected: 'CONNECTED'
+        }
         class App {
-            constructor() {
-                let gamepad = new Gamepad();
+            constructor(url) {
+                this.isConnected = false;
+                // 建立websocket连接
+                this.ws = new WebSocket(url);
+                this.ws.addEventListener('message',({data}) => {
+                    this.isConnected = true;
+                    const res = JSON.parse(data);
+                    this.onData(res);
+                });
+                let gamepad = new Gamepad(document.querySelector('.gamepad'));
+                gamepad.onData(data => {
+                    if(!this.isConnected) return;
+                    this.send({
+                        name: MSG_TYPES.playerDataSend,
+                        body: data
+                    });
+                })
             }
-            _bindEvent() {
-                
+            send(msg) {
+                this.ws.send(JSON.stringify(msg));
             }
         }
+        new App('ws://127.0.0.1:8086');
     </script>
 </body>
 </html>

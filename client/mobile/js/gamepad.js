@@ -1,4 +1,4 @@
-// class GamePad {
+// class Gamepad {
 //     constructor() {
 //         this.orientation = {};
 //         this._init();
@@ -9,7 +9,7 @@
 //             alert('该设备不支持陀螺仪');
 //             return;
 //         }
-//         this.buttonA = new GamePadButton()
+//         this.buttonA = new GamepadButton()
 //     }
 //     _bindEvent() {
 //         let handleOrientation = event => {
@@ -26,7 +26,7 @@ class Base {
         this.controlList = [];
         this._init();
         this.start();
-        this._render();
+        window.requestAnimationFrame(this._render.bind(this));
     }
     addControl(control) {
         this.controlList.push(control);
@@ -51,13 +51,20 @@ class Base {
         this.update();
         window.requestAnimationFrame(this._render.bind(this));
     }
-    start() {}
+    start() {
+        // let buttonA = new GamepadButton();
+        // this.addControl(buttonA);
+    }
     update() {}
 }
-class GamePad extends Base {
+class Gamepad extends Base {
     constructor(el) {
         super(el);
         this.orientation = {};
+        this._dataUpdate = () => {}
+    }
+    onData(callback) {
+        this._dataUpdate = callback;
     }
     _bindEvent() {
         const {canvas} = this;
@@ -87,17 +94,24 @@ class GamePad extends Base {
             control.touched = false;
         }).bind(this));
     }
+    get gamepadData() {
+        const {orientation,controlList} = this;
+        return {
+            orientation,
+            controlList
+        }
+    }
     start() {
         this._bindEvent();
-        this.buttonA = new GamepadButton();
-        this.addControl(this.buttonA);
+        // let buttonA = new GamepadButton();
+        // this.addControl(buttonA);
     }
     update() {
-        sendMsg();
+        this._dataUpdate(this.gamepadData);
     }
 }
 // 手柄元组件
-class GamePadControl {
+class GamepadControl {
     constructor(ctx, {x,y,size,enable,style}) {
         this.ctx = ctx;
         this.x = x;
@@ -114,7 +128,7 @@ class GamePadControl {
     draw() {}
 }
 // 手柄按钮
-class GamePadButton extends GamePadControl {
+class GamepadButton extends GamepadControl {
     constructor(ctx, {x,y,size,enable,style}) {
         this.ctx = ctx;
         this.x = x;
@@ -137,7 +151,7 @@ class GamePadButton extends GamePadControl {
         ctx.fillText(style.text)
     }
 }
-// class GamePadTouchPad {
+// class GamepadTouchPad {
 //     constructor
 // }
 // class UIButton {

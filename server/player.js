@@ -8,3 +8,4 @@ class Player {
         this.speed = 1;
     }
 }
+module.exports = Player;
