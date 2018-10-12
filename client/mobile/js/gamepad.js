@@ -60,7 +60,7 @@ class Base {
 class Gamepad extends Base {
     constructor(el) {
         super(el);
-        this.orientation = {};
+        this.orientation = {x: 0, y: 0, z: 0};
         this._dataUpdate = () => {}
     }
     onData(callback) {

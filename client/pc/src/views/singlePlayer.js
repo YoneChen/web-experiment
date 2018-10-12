@@ -3,15 +3,14 @@ import {Scene} from '@/core';
 import GameManager from '@/utils/game/game';
 import {Aircraft,City,Button} from '@/components';
 import '@/lib/GLTFLoader';
-const socketUrl = '',
-mobileUrl = ''
+const socketUrl = 'ws://127.0.0.1:8086',
+mobileUrl = '';
 class App extends Scene {
     start() {
-        // this.root.game = new GameManager(socketUrl,mobileUrl);
-        // this.root.game.createGame();
-        // this.root.game.onPlayerConnected = this.onPlayerConnected.bind(this);
+        this.root.game = new GameManager(socketUrl,mobileUrl);
+        this.root.game.onPlayerData = this.onPlayerData.bind(this);
+        this.root.game.onPlayerJoin = this.onPlayerJoin.bind(this);
         this.addCity();
-        this.addAircraft();
         this.addDirectLight();
         
     }
@@ -26,8 +25,12 @@ class App extends Scene {
     //     this.selfRole.audioListener = this.root.audioListener;
     //     this.initRole(this.selfRole,roleData.role_transform);
     // }
-    onPlayerConnected() {
-
+    onPlayerJoin(player) {
+        console.log('添加玩家模型');
+        this.addAircraft(player);
+    }
+    onPlayerData(player) {
+        this.setAircraftData(this.aircraft,player);
     }
     addCity() {
         const city = new City();
@@ -38,18 +41,23 @@ class App extends Scene {
         // mesh.position.set(0,0,-3);
         // this.add(mesh)
     }
-    addAircraft() {
+    addAircraft(player) {
         const aircraft = new Aircraft(this.root.camera);
-        // aircraft.position.set(0,50,4);
-        window.aircraft = aircraft;
+        this.setAircraftData(aircraft,player);
+        // window.aircraft = aircraft;
         this.add(aircraft);
         this.aircraft = aircraft;
     }
-    initRole(role,{position,rotation}) {
-        role.position.set(position.x,position.y,position.z);
-        role.rotation.set(rotation.x,rotation.y,rotation.z);
-        this.add(role);
+    setAircraftData(aircraft,player) {
+        let {position, rotation} = player;
+        aircraft.position.set(position.x,position.y,position.z);
+        aircraft.rotation.set(rotation.x,rotation.y,rotation.z);
     }
+    // initRole(role,{position,rotation}) {
+    //     role.position.set(position.x,position.y,position.z);
+    //     role.rotation.set(rotation.x,rotation.y,rotation.z);
+    //     this.add(role);
+    // }
     // addSpace() {
     //     const stars1 = new Space({
     //         num: 6000,
