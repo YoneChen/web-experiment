@@ -3,11 +3,11 @@ import {Scene} from '@/core';
 import GameManager from '@/utils/game/game';
 import {Aircraft,City,Button} from '@/components';
 import '@/lib/GLTFLoader';
-const HOSTNAME = '192.168.1.108'
 const socketUrl = `ws://${location.hostname}:8086`,
-mobileUrl = `http://${HOSTNAME}:8087/html/`;
+mobileUrl = `http://10.66.68.95:8087/html/`;
 class App extends Scene {
     start() {
+        this.root.scene.fog = new THREE.FogExp2( 0xd0e0f0, 0.0025 );
         this.root.camera.position.set(0,10,500);        
         this.root.camera.rotation.set(-Math.PI/4,0,0);
         this.root.game = new GameManager(socketUrl,mobileUrl);
@@ -45,8 +45,10 @@ class App extends Scene {
         this.add(city);
     }
     addAircraft(player) {
+        if (this.aircraft) this.removeAircraft();
         const aircraft = new Aircraft(this.root.camera);
         this.setAircraftData(aircraft,player);
+        aircraft.position.set(0,10,500);        
         // window.aircraft = aircraft;
         this.add(aircraft);
         this.aircraft = aircraft;
@@ -56,8 +58,11 @@ class App extends Scene {
     }
     setAircraftData(aircraft,player) {
         let {position, rotation} = player;
-        aircraft.position.set(position.x,position.y,position.z);
+        // aircraft.position.set(position.x,position.y,position.z);
         aircraft.rotation.set(rotation.x,rotation.y,rotation.z);
+        let v = new THREE.Vector3(0,0,-1);
+        v.applyQuaternion(aircraft.quaternion).normalize();
+        aircraft.translateOnAxis(v,player.speed);
     }
     // initRole(role,{position,rotation}) {
     //     role.position.set(position.x,position.y,position.z);
@@ -127,6 +132,7 @@ class App extends Scene {
         this.add(light);
     }
     update() {
+        if (this.aircraft) this.aircraft.update();
         // this.aircraft.position.y -= 0.1;
     }
 }

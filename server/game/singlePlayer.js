@@ -5,7 +5,7 @@ module.exports = function(player,gampadData,gameData) {
     }
     gampadData.controlList.forEach(control => {
         switch(control.name) {
-            case 'A': changePlayerSpeed(player)
+            case '走': changePlayerSpeed(player,control)
         }
     })
     // player.rotation.y = gampadData.orientation.y /4;
@@ -19,7 +19,9 @@ module.exports = function(player,gampadData,gameData) {
     player.rotation.y += d1;
     player.rotation.x += d2;
 }
-function changePlayerSpeed(player) {
+function changePlayerSpeed(player,control) {
+    if (control.touched) player.speed = 1;
+    else player.speed = 0;
     // let {rotation} = player;
     // player.position.x += 1 * Math.cos(rotation.z);
     // player.position.y += 1 * Math.cos(rotation.z);

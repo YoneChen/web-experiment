@@ -1,6 +1,7 @@
 const {Object3D} = THREE;
+import Laser from './laser'
 import {getGLTFModel,getTexture} from '@/utils/common';
-const MODEL_PATH = 'model/aircraft/scene.gltf';
+const MODEL_PATH = 'model/aircraft/flying sacuer.gltf';
 class Aircraft extends Object3D {
     constructor(camera) {
         super();
@@ -16,16 +17,23 @@ class Aircraft extends Object3D {
         this.camera.position.set(0, 4, 4);
         // this.camera.rotation.set(Math.PI/4,0,0);
         // model.position.set(0,-4,-4);
-        model.scale.set(0.01,0.01,0.01);
+        // model.scale.set(1,1,1);
         this.add(model);
+        this.model = model;
         this.add(this.camera);
+        this.fire();
         // this.camera.rotation.set(-Math.PI/4, 0, 0);
+    }
+    fire() {
+        let laser = new Laser();
+        this.add(laser);
     }
     _loaded() {}
     onLoad(callback) {
         this._loaded = callback;
     }
     update() {
+        if(this.model) this.model.rotation.y += 0.1;
     }
 }
 export default Aircraft;

@@ -14,17 +14,43 @@
             height: 100%;
             overflow: hidden;
         }
+        .entry {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #222;
+        }
+        .btn {
+            width: 100px;
+            height: 100px;
+            transform: rotate(90deg);
+            border-radius: 50%;
+            line-height: 100px;
+            border: solid 2px #00aadd;
+            text-align: center;
+            font-size: 32px;
+            color: #00aadd
+        }
+        .btn:active {
+            background-color: #00aadd;
+            color: #fff;
+        }
         .gamepad {
             height: 100%;
         }
     </style>
 </head>
 <body>
-    <!-- 登录板块 -->
-    <!-- <section class="login">
-
-    </section> -->
     <section class="gamepad">
+    </section>
+    <!-- 登录板块 -->
+    <section class="entry">
+        <h4 class="btn">玩</h4>
     </section>
     <script src="../js/gamepad.js"></script>
     <script>
@@ -39,6 +65,26 @@
         class App {
             constructor(url) {
                 this.isConnected = false;
+                let el_entry = document.querySelector('.entry');
+                let gamepad = new Gamepad(document.querySelector('.gamepad'));
+                gamepad.onData(data => {
+                    if(!this.isConnected) return;
+                    
+                    if (el_entry.style.display !== 'none') el_entry.style.display = 'none';
+                    try {
+                        this.send({
+                            name: MSG_TYPES.playerData,
+                            body: data
+                        });
+                    } catch(err) {
+                        this.isConnected = false;
+                    }
+                });
+                document.querySelector('.btn').addEventListener('touchstart',e => {
+                    this.connect(url);
+                })
+            }
+            connect(url) {
                 // 建立websocket连接
                 this.ws = new WebSocket(url);
                 this.ws.addEventListener('message',({data}) => {
@@ -51,18 +97,6 @@
                         console.log(data);
                     }
                 });
-                let gamepad = new Gamepad(document.querySelector('.gamepad'));
-                gamepad.onData(data => {
-                    if(!this.isConnected) return;
-                    try {
-                        this.send({
-                            name: MSG_TYPES.playerData,
-                            body: data
-                        });
-                    } catch(err) {
-                        this.isConnected = false;
-                    }
-                })
             }
             send(msg) {
                 this.ws.send(JSON.stringify(msg));

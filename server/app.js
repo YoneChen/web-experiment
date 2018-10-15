@@ -43,6 +43,7 @@ class GameServer {
         this.game.ws = ws;
     }
     playerJoin(ws,msg) {
+        if (this.game.ws.readyState === WebSocket.CLOSED) return;
         let player = new Player();
         this.gameDataProcessor(player);
         this.game.addPlayer(player);
@@ -71,6 +72,7 @@ class GameServer {
     }
     // 手机控制器数据发送给主机
     playerDataSend(ws,msg) {
+        if (this.game.ws.readyState === WebSocket.CLOSED) return;
         let player = this.getPlayerByWS(ws);
         if(!player) return;
         let gamepadData = msg.body;

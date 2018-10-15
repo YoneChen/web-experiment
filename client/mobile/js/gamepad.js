@@ -1,25 +1,4 @@
-// class Gamepad {
-//     constructor() {
-//         this.orientation = {};
-//         this._init();
-//         this._bindEvent();
-//     }
-//     _init() {
-//         if (!/Android|iPhone|iPad/i.test(navigator.userAgent) || !window.DeviceOrientationEvent) {
-//             alert('该设备不支持陀螺仪');
-//             return;
-//         }
-//         this.buttonA = new GamepadButton()
-//     }
-//     _bindEvent() {
-//         let handleOrientation = event => {
-//             this.orientation.x = event.beta;
-//             this.orientation.x = event.beta;
-//             this.orientation.z = event.alpha;
-//         }
-//         window.addEventListener('deviceorientation',handleOrientation.bind(this));
-//     }
-// }
+
 class Base {
     constructor(el) {
         this.el = el;
@@ -68,7 +47,8 @@ class Base {
     }
     _render() {
         const {canvas,ctx} = this;
-        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.fillStyle = "#222222";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         this.controlList.forEach(control => control.draw(ctx));
         this.update();
         window.requestAnimationFrame(this._render.bind(this));
@@ -105,27 +85,12 @@ class Gamepad extends Base {
         return {
             origin,
             orientation,
-            controlList
+            controlList: controlList.map(control => control.data)
         }
     }
     start() {
         this._bindEvent();
         let buttonA = new GamepadButton({
-            x: 2000,
-            y: 300,
-            size: 100,
-            border: {
-                width: 5,
-                color: '#00aadd'
-            },
-            font: {
-                text: 'A',
-                size: 50,
-                color: '#00aadd'
-            }
-        });
-        this.addControl(buttonA);
-        let buttonC = new GamepadButton({
             x: 300,
             y: 300,
             size: 100,
@@ -134,7 +99,22 @@ class Gamepad extends Base {
                 color: '#00aadd'
             },
             font: {
-                text: 'C',
+                text: '走',
+                size: 50,
+                color: '#00aadd'
+            }
+        });
+        this.addControl(buttonA);
+        let buttonC = new GamepadButton({
+            x: 1600,
+            y: 300,
+            size: 100,
+            border: {
+                width: 5,
+                color: '#00aadd'
+            },
+            font: {
+                text: '打',
                 size: 50,
                 color: '#00aadd'
             }
@@ -184,6 +164,13 @@ class GamepadButton {
         this.enable = enable;
         this._lastTouched = false;
         this._touched = false;
+    }
+    get data() {
+        const {name,touched} = this;
+        return {
+            name,
+            touched
+        }
     }
     get touched() {
         return this._touched;
