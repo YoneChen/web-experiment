@@ -8,7 +8,7 @@ const MSG_TYPES = {
     hostJoin: 'HOST_JOIN',
     hostLeave: 'HOST_LEAVE',
     playerJoin: 'PLAYER_JOIN',
-    mobileLeave: 'MOBILE_LEAVE',
+    playerLeave: 'PLAYER_LEAVE',
     connected: 'CONNECTED',
     createGame: 'CREATE_GAME',
     gameData: 'GAME_DATA'
@@ -18,8 +18,8 @@ class GameServer {
         port,
         gameDataProcessor
     }) {
-        let wss = new WebSocket.Server({ port });
-        wss.on('connection', this._connection.bind(this));
+        this.wss = new WebSocket.Server({ port });
+        this.wss.on('connection', this._connection.bind(this));
         this.gameDataProcessor = gameDataProcessor;
     }
     _connection(ws) {
@@ -28,6 +28,7 @@ class GameServer {
         }));
         // connectionFeedback(wss,ws); // 新用户连接，通知该用户其他用户的userId，通知其他用户该用户的userId
         ws.on('message', data => {
+            this.clearDisconnectedPlayers();
             const msg = JSON.parse(data);
             switch(msg.name) {
                 case MSG_TYPES.hostJoin: this.hostJoin(ws); break;
@@ -54,6 +55,19 @@ class GameServer {
     }
     getPlayerByWS(ws) {
         return this.game.playerList.find(player => player.ws === ws);
+    }
+    clearDisconnectedPlayers() { // 清理断开连接的玩家
+        if (!this.game || !this.game.playerList.length) return;
+        let disconnetedPlayers = this.game.playerList.filter(player => player.ws.readyState === WebSocket.CLOSED);
+        if (disconnetedPlayers.length) disconnetedPlayers.forEach(player => {
+            console.log(player.id,'disconneted');
+            let msg = {
+                name: MSG_TYPES.playerLeave,
+                body: player
+            }
+            this.game.ws.send(JSON.stringify(msg));
+            this.game.removePlayer(player);
+        })
     }
     // 手机控制器数据发送给主机
     playerDataSend(ws,msg) {

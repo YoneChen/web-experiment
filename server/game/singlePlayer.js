@@ -1,8 +1,26 @@
-module.exports = function(player,gampadData) {
+module.exports = function(player,gampadData,gameData) {
     if(!gampadData) {
-        player.position = {x: 0, y: 50, z: 4};
+        player.position = {x: 0, y: 10, z: 500};
         return;
     }
-    player.orientation = gampadData.orientation;
-    player.position = {x: 0, y: 50, z: 4};
+    gampadData.controlList.forEach(control => {
+        switch(control.name) {
+            case 'A': changePlayerSpeed(player)
+        }
+    })
+    // player.rotation.y = gampadData.orientation.y /4;
+    let d1 = gampadData.orientation.y - gampadData.origin.orientation.y;
+    let d2 = gampadData.orientation.x - gampadData.origin.orientation.x;
+    // console.log()
+    if (Math.abs(d1) > Math.PI) {
+        d1 = d1 > 0 ? d1 - 2 * Math.PI : 2 * Math.PI - d1;
+    }
+    console.log(d1);
+    player.rotation.y += d1;
+    player.rotation.x += d2;
+}
+function changePlayerSpeed(player) {
+    // let {rotation} = player;
+    // player.position.x += 1 * Math.cos(rotation.z);
+    // player.position.y += 1 * Math.cos(rotation.z);
 }

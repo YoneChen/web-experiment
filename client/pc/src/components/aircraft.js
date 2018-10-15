@@ -13,11 +13,13 @@ class Aircraft extends Object3D {
     async _init() {
         const {scene: model} = await getGLTFModel(MODEL_PATH);
         model.rotation.set(0, Math.PI, 0);
-        model.position.set(0,-4,-4);
+        this.camera.position.set(0, 4, 4);
+        // this.camera.rotation.set(Math.PI/4,0,0);
+        // model.position.set(0,-4,-4);
         model.scale.set(0.01,0.01,0.01);
         this.add(model);
         this.add(this.camera);
-        this.camera.rotation.set(-Math.PI/4, 0, 0);
+        // this.camera.rotation.set(-Math.PI/4, 0, 0);
     }
     _loaded() {}
     onLoad(callback) {

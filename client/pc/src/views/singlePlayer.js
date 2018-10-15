@@ -3,15 +3,19 @@ import {Scene} from '@/core';
 import GameManager from '@/utils/game/game';
 import {Aircraft,City,Button} from '@/components';
 import '@/lib/GLTFLoader';
-const socketUrl = 'ws://127.0.0.1:8086',
-mobileUrl = '';
+const HOSTNAME = '192.168.1.108'
+const socketUrl = `ws://${location.hostname}:8086`,
+mobileUrl = `http://${HOSTNAME}:8087/html/`;
 class App extends Scene {
     start() {
+        this.root.camera.position.set(0,10,500);        
+        this.root.camera.rotation.set(-Math.PI/4,0,0);
         this.root.game = new GameManager(socketUrl,mobileUrl);
         this.root.game.onPlayerData = this.onPlayerData.bind(this);
         this.root.game.onPlayerJoin = this.onPlayerJoin.bind(this);
-        this.addCity();
-        this.addDirectLight();
+        this.root.game.onPlayerLeave = this.onPlayerLeave.bind(this);
+        this.addCity(); // 添加城市
+        this.addDirectLight(); // 添加灯光
         
     }
     loaded() {
@@ -26,8 +30,12 @@ class App extends Scene {
     //     this.initRole(this.selfRole,roleData.role_transform);
     // }
     onPlayerJoin(player) {
-        console.log('添加玩家模型');
+        console.log(player.id,'玩家加入游戏');
         this.addAircraft(player);
+    }
+    onPlayerLeave(player) {
+        console.log(player.id,'玩家已离开');
+        this.removeAircraft(player);
     }
     onPlayerData(player) {
         this.setAircraftData(this.aircraft,player);
@@ -35,11 +43,6 @@ class App extends Scene {
     addCity() {
         const city = new City();
         this.add(city);
-        // let mesh = new THREE.Mesh(new THREE.CubeGeometry(10,10,10), new THREE.MeshLambertMaterial({
-        //     color: 0xffffff
-        // }))
-        // mesh.position.set(0,0,-3);
-        // this.add(mesh)
     }
     addAircraft(player) {
         const aircraft = new Aircraft(this.root.camera);
@@ -47,6 +50,9 @@ class App extends Scene {
         // window.aircraft = aircraft;
         this.add(aircraft);
         this.aircraft = aircraft;
+    }
+    removeAircraft() {
+        this.remove(this.aircraft)
     }
     setAircraftData(aircraft,player) {
         let {position, rotation} = player;

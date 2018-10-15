@@ -5,12 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Mobile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        html,body {
+            height: 100%;
+            overflow: hidden;
+        }
+        .gamepad {
+            height: 100%;
+        }
+    </style>
 </head>
 <body>
     <!-- 登录板块 -->
-    <section class="login">
+    <!-- <section class="login">
 
-    </section>
+    </section> -->
     <section class="gamepad">
     </section>
     <script src="../js/gamepad.js"></script>
@@ -55,7 +68,7 @@
                 this.ws.send(JSON.stringify(msg));
             }
         }
-        new App('ws://127.0.0.1:8086');
+        new App(`ws://${location.hostname}:8086`);
     </script>
 </body>
 </html>

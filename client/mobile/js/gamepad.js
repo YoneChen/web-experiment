@@ -38,16 +38,38 @@ class Base {
         const { el } = this;
 		// 初始化场景
         let canvas = document.createElement('canvas');
-        canvas.style.width = el.clientWidth + 'px', canvas.style.height = el.clientHeight + 'px';
-        canvas.width = el.clientWidth * window.devicePixelRatio, canvas.height = el.clientHeight * window.devicePixelRatio;
+        canvas.style.width = el.clientHeight + 'px', canvas.style.height = el.clientWidth + 'px';
+        let offest = (el.clientWidth - el.clientHeight)/2;
+        canvas.style.transform = `translate(${offest}px,${-offest}px) rotate(90deg)`;
+        canvas.width = el.clientHeight * window.devicePixelRatio, canvas.height = el.clientWidth * window.devicePixelRatio;
         el.appendChild(canvas);
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
+        // 按钮控件
+        let isTrigger = (touch,control) => {
+            let [tx,ty] = [ touch.pageY  * window.devicePixelRatio, (el.clientWidth - touch.pageX)  * window.devicePixelRatio ]
+            return tx > control.left && ty > control.top && tx < control.right && ty < control.bottom;
+        }
+        let handleTouch = callback => event => {
+            event.preventDefault();
+            Array.from(event.changedTouches).forEach(touch => {
+                this.controlList.forEach(control => isTrigger(touch,control) && callback(control));
+            })
+        }
+        canvas.addEventListener('touchstart',handleTouch(control => {
+            control.touched = true;
+        }).bind(this));
+        canvas.addEventListener('touchmove',handleTouch(control => {
+            control.touched = true;
+        }).bind(this));
+        canvas.addEventListener('touchend',handleTouch(control => {
+            control.touched = false;
+        }).bind(this));
     }
     _render() {
         const {canvas,ctx} = this;
         ctx.clearRect(0,0,canvas.width,canvas.height);
-        this.controlList.forEach(control => control.draw());
+        this.controlList.forEach(control => control.draw(ctx));
         this.update();
         window.requestAnimationFrame(this._render.bind(this));
     }
@@ -61,6 +83,8 @@ class Gamepad extends Base {
     constructor(el) {
         super(el);
         this.orientation = {x: 0, y: 0, z: 0};
+        this.origin = {};
+        this._resetPos();
         this._dataUpdate = () => {}
     }
     onData(callback) {
@@ -70,44 +94,60 @@ class Gamepad extends Base {
         const {canvas} = this;
         // 陀螺仪数据
         let handleOrientation = event => {
-            this.orientation.x = event.beta;
-            this.orientation.x = event.beta;
-            this.orientation.z = event.alpha;
+            this.orientation.x = -event.gamma * Math.PI / 180;
+            this.orientation.y = event.alpha * Math.PI / 180;
+            this.orientation.z = event.beta;
         }
         window.addEventListener('deviceorientation',handleOrientation.bind(this));
-        // 按钮控件
-        let isTrigger = (touch,control) => {
-            touch.pageX > control.left && touch.pageY > control.top && touch.pageX < control.right && control.pageY < control.bottom;
-        }
-        let handleTouch = callback => event => {
-            event.changedTouches.forEach(touch => {
-                this.controlList.forEach(control => isTrigger(touch,control) && callback(control));
-            })
-        }
-        canvas.addEventListener('touchstart',handleTouch(control => {
-            control.touched = true;
-        }).bind(this));
-        canvas.addEventListener('touchmove',handleTouch(control => {
-            control.touched = false;
-        }).bind(this));
-        canvas.addEventListener('touchend',handleTouch(control => {
-            control.touched = false;
-        }).bind(this));
     }
     get gamepadData() {
-        const {orientation,controlList} = this;
+        const {orientation,controlList,origin} = this;
         return {
+            origin,
             orientation,
             controlList
         }
     }
     start() {
         this._bindEvent();
-        // let buttonA = new GamepadButton();
-        // this.addControl(buttonA);
+        let buttonA = new GamepadButton({
+            x: 2000,
+            y: 300,
+            size: 100,
+            border: {
+                width: 5,
+                color: '#00aadd'
+            },
+            font: {
+                text: 'A',
+                size: 50,
+                color: '#00aadd'
+            }
+        });
+        this.addControl(buttonA);
+        let buttonC = new GamepadButton({
+            x: 300,
+            y: 300,
+            size: 100,
+            border: {
+                width: 5,
+                color: '#00aadd'
+            },
+            font: {
+                text: 'C',
+                size: 50,
+                color: '#00aadd'
+            }
+        });
+        this.addControl(buttonC);
+        // buttonC.onTap = this._resetPos.bind(this);
+    }
+    _resetPos() {
+        this.origin.orientation = Object.assign({},this.orientation);
     }
     update() {
         this._dataUpdate(this.gamepadData);
+        this._resetPos();
     }
 }
 // 手柄元组件
@@ -128,9 +168,9 @@ class GamepadControl {
     draw() {}
 }
 // 手柄按钮
-class GamepadButton extends GamepadControl {
-    constructor(ctx, {x,y,size,enable,style}) {
-        this.ctx = ctx;
+class GamepadButton {
+    constructor({x,y,size,enable,border,font}) {
+        this.name = font.text;
         this.x = x;
         this.y = y;
         this.left = x - size;
@@ -138,17 +178,52 @@ class GamepadButton extends GamepadControl {
         this.right = x + size;
         this.bottom = y + size;
         this.size = size;
-        this.text = text;
-        this.image = image;
+        this.font = font;
+        // this.image = image;
+        this.border = border;
         this.enable = enable;
+        this._lastTouched = false;
+        this._touched = false;
     }
-    get isPressed() {
-        return this._isPressed;
+    get touched() {
+        return this._touched;
     }
-    draw() {
-        const {ctx,x,y,size,style} = this;
+    set touched(val) {
+        this._touched = val;
+        if (this._touched)  {
+            if (!this._lastTouched) {
+                navigator.vibrate(100);
+                this.onTap();
+            }
+        }
+        this._lastTouched = val;
+    }
+    onTap() {}
+    draw(ctx) {
+        const {x,y,size,font,border,background} = this;
+        // ctx.fillStyle = backgroundColor;
+        ctx.beginPath();
         ctx.arc(x,y,size,0,Math.PI * 2);
-        ctx.fillText(style.text)
+        this._stroke(ctx,border);
+        ctx.closePath();
+        if (this.touched) this._fill(ctx,border);
+        else this._stroke(ctx,border);
+        // ctx.fillRect(0, 0, _width, _height);
+        ctx.font = `${font.size}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(font.text, x, y);
+    }
+    _stroke(ctx,border) {
+        ctx.lineWidth = border.width;
+        ctx.strokeStyle = border.color;
+        ctx.stroke();
+        ctx.fillStyle = border.color;
+    }
+    _fill(ctx,border) {
+        ctx.fillStyle = border.color;
+        ctx.fill();
+        ctx.fillStyle = '#ffffff';
     }
 }
 // class GamepadTouchPad {
