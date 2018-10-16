@@ -4,7 +4,7 @@ import GameManager from '@/utils/game/game';
 import {Aircraft,City,Button} from '@/components';
 import '@/lib/GLTFLoader';
 const socketUrl = `ws://${location.hostname}:8086`,
-mobileUrl = `http://10.66.68.95:8087/html/`;
+mobileUrl = `http://10.66.68.91:8087/html/`;
 class App extends Scene {
     start() {
         this.root.renderer.setClearColor(0x519EcB);
@@ -47,7 +47,7 @@ class App extends Scene {
     }
     addAircraft(player) {
         if (this.aircraft) this.removeAircraft();
-        const aircraft = new Aircraft(this.root.camera);
+        const aircraft = new Aircraft(this.root);
         this.setAircraftData(aircraft,player);
         aircraft.position.set(0,10,500);        
         // window.aircraft = aircraft;

@@ -27,7 +27,7 @@ class Base {
         this.ctx = canvas.getContext('2d');
         // 按钮控件
         let isTrigger = (touch,control) => {
-            let [tx,ty] = [ touch.pageY  * window.devicePixelRatio, (el.clientWidth - touch.pageX)  * window.devicePixelRatio ]
+            let [tx,ty] = [ touch.pageY, (el.clientWidth - touch.pageX) ]
             return tx > control.left && ty > control.top && tx < control.right && ty < control.bottom;
         }
         let handleTouch = callback => event => {
@@ -184,7 +184,12 @@ class GamepadButton {
         this.tapped = false;
         if (this._touched)  {
             if (!this._lastTouched) {
-                navigator.vibrate(100);
+                try {
+                    navigator.vibrate(100);
+                    
+                } catch (error) {
+                    
+                }
                 this.tapped = true;
             }
         }

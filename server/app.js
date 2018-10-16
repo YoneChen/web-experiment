@@ -66,7 +66,7 @@ class GameServer {
                 name: MSG_TYPES.playerLeave,
                 body: player
             }
-            this.game.ws.send(JSON.stringify(msg));
+            if (!this.game.ws.readyState === WebSocket.CLOSED) this.game.ws.send(JSON.stringify(msg));
             this.game.removePlayer(player);
         })
     }
