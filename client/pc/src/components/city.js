@@ -13,7 +13,7 @@ class City extends Object3D {
         const {scene: model} = await getGLTFModel(MODEL_CITY_PATH);
         this._isLoaded = true;
         model.scale.set(100,100,100);
-        // model.position.set(0,-17,3);
+        model.position.set(0,400,0);
         this.add(model);
     }
     _loaded() {}

@@ -1,11 +1,12 @@
 module.exports = function(player,gampadData,gameData) {
     if(!gampadData) {
-        player.position = {x: 0, y: 10, z: 500};
+        player.position = {x: 0, y: 200, z: 500};
         return;
     }
     gampadData.controlList.forEach(control => {
         switch(control.name) {
             case '走': changePlayerSpeed(player,control)
+            case '打': changePlayerShot(player,control)
         }
     })
     // player.rotation.y = gampadData.orientation.y /4;
@@ -22,6 +23,13 @@ module.exports = function(player,gampadData,gameData) {
 function changePlayerSpeed(player,control) {
     if (control.touched) player.speed = 1;
     else player.speed = 0;
+    // let {rotation} = player;
+    // player.position.x += 1 * Math.cos(rotation.z);
+    // player.position.y += 1 * Math.cos(rotation.z);
+}
+function changePlayerShot(player,control) {
+    if (control.tapped) player.shot = 1;
+    else player.shot = 0;
     // let {rotation} = player;
     // player.position.x += 1 * Math.cos(rotation.z);
     // player.position.y += 1 * Math.cos(rotation.z);

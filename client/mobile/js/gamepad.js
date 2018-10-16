@@ -18,6 +18,7 @@ class Base {
 		// 初始化场景
         let canvas = document.createElement('canvas');
         canvas.style.width = el.clientHeight + 'px', canvas.style.height = el.clientWidth + 'px';
+        this.width = el.clientHeight, this.height = el.clientWidth;
         let offest = (el.clientWidth - el.clientHeight)/2;
         canvas.style.transform = `translate(${offest}px,${-offest}px) rotate(90deg)`;
         canvas.width = el.clientHeight * window.devicePixelRatio, canvas.height = el.clientWidth * window.devicePixelRatio;
@@ -91,31 +92,31 @@ class Gamepad extends Base {
     start() {
         this._bindEvent();
         let buttonA = new GamepadButton({
-            x: 300,
-            y: 300,
-            size: 100,
+            x: 150,
+            y: this.height/2,
+            size: 48,
             border: {
-                width: 5,
+                width: 2,
                 color: '#00aadd'
             },
             font: {
                 text: '走',
-                size: 50,
+                size: 20,
                 color: '#00aadd'
             }
         });
         this.addControl(buttonA);
         let buttonC = new GamepadButton({
-            x: 1600,
-            y: 300,
-            size: 100,
+            x: this.width - 150,
+            y: this.height/2,
+            size: 48,
             border: {
-                width: 5,
+                width: 2,
                 color: '#00aadd'
             },
             font: {
                 text: '打',
-                size: 50,
+                size: 20,
                 color: '#00aadd'
             }
         });
@@ -123,6 +124,7 @@ class Gamepad extends Base {
         // buttonC.onTap = this._resetPos.bind(this);
     }
     _resetPos() {
+        this.controlList.forEach(control => control.tapped = false);
         this.origin.orientation = Object.assign({},this.orientation);
     }
     update() {
@@ -164,12 +166,14 @@ class GamepadButton {
         this.enable = enable;
         this._lastTouched = false;
         this._touched = false;
+        this.tapped = false;
     }
     get data() {
-        const {name,touched} = this;
+        const {name,touched,tapped} = this;
         return {
             name,
-            touched
+            touched,
+            tapped
         }
     }
     get touched() {
@@ -177,32 +181,32 @@ class GamepadButton {
     }
     set touched(val) {
         this._touched = val;
+        this.tapped = false;
         if (this._touched)  {
             if (!this._lastTouched) {
                 navigator.vibrate(100);
-                this.onTap();
+                this.tapped = true;
             }
         }
         this._lastTouched = val;
     }
-    onTap() {}
     draw(ctx) {
         const {x,y,size,font,border,background} = this;
         // ctx.fillStyle = backgroundColor;
         ctx.beginPath();
-        ctx.arc(x,y,size,0,Math.PI * 2);
+        ctx.arc(x * window.devicePixelRatio,y * window.devicePixelRatio,size * window.devicePixelRatio,0,Math.PI * 2);
         this._stroke(ctx,border);
         ctx.closePath();
         if (this.touched) this._fill(ctx,border);
         else this._stroke(ctx,border);
         // ctx.fillRect(0, 0, _width, _height);
-        ctx.font = `${font.size}px Arial`;
+        ctx.font = `${ font.size  * window.devicePixelRatio }px Arial`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(font.text, x, y);
+        ctx.fillText(font.text , x * window.devicePixelRatio, y * window.devicePixelRatio);
     }
     _stroke(ctx,border) {
-        ctx.lineWidth = border.width;
+        ctx.lineWidth = border.width * window.devicePixelRatio;
         ctx.strokeStyle = border.color;
         ctx.stroke();
         ctx.fillStyle = border.color;
@@ -215,14 +219,4 @@ class GamepadButton {
 }
 // class GamepadTouchPad {
 //     constructor
-// }
-// class UIButton {
-//     constructor(ctx,{x,y,size,text,image}) {
-//         this.ctx = ctx;
-//         this.x = x;
-//         this.y = y;
-//         this.size = size;
-//         this.text = text;
-//         this.image = image;
-//     }
 // }

@@ -7,8 +7,9 @@ const socketUrl = `ws://${location.hostname}:8086`,
 mobileUrl = `http://10.66.68.95:8087/html/`;
 class App extends Scene {
     start() {
-        this.root.scene.fog = new THREE.FogExp2( 0xd0e0f0, 0.0025 );
-        this.root.camera.position.set(0,10,500);        
+        this.root.renderer.setClearColor(0x519EcB);
+        this.root.scene.fog = new THREE.FogExp2( 0xd0e0f0, 0.001 );
+        this.root.camera.position.set(0,200,500);        
         this.root.camera.rotation.set(-Math.PI/4,0,0);
         this.root.game = new GameManager(socketUrl,mobileUrl);
         this.root.game.onPlayerData = this.onPlayerData.bind(this);
@@ -63,6 +64,8 @@ class App extends Scene {
         let v = new THREE.Vector3(0,0,-1);
         v.applyQuaternion(aircraft.quaternion).normalize();
         aircraft.translateOnAxis(v,player.speed);
+        if (player.shot) console.log('玩家开火了');
+        if (player.shot) aircraft.fire();
     }
     // initRole(role,{position,rotation}) {
     //     role.position.set(position.x,position.y,position.z);

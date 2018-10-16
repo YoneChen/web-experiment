@@ -1,5 +1,5 @@
 const {Object3D} = THREE;
-import Laser from './laser'
+import Bullet from './bullet'
 import {getGLTFModel,getTexture} from '@/utils/common';
 const MODEL_PATH = 'model/aircraft/flying sacuer.gltf';
 class Aircraft extends Object3D {
@@ -21,12 +21,24 @@ class Aircraft extends Object3D {
         this.add(model);
         this.model = model;
         this.add(this.camera);
-        this.fire();
         // this.camera.rotation.set(-Math.PI/4, 0, 0);
     }
     fire() {
-        let laser = new Laser();
-        this.add(laser);
+        let bullet = new Bullet();
+        bullet.rotation.x = Math.PI/2;
+        this.add(bullet);
+        this.fly(bullet);
+    }
+    fly(bullet) {
+        let animate =  new TWEEN.Tween({ z: 0 })
+		.to({ z: -1000 }, 10000)
+		.onUpdate(({ z }) => {
+			bullet.position.z = z;
+		})
+		.onStop(() => {
+			bullet.visible = false;
+        });
+        animate.start();
     }
     _loaded() {}
     onLoad(callback) {
